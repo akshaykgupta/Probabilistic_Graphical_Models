@@ -1,0 +1,171 @@
+\documentclass[]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{enumitem}
+\usepackage{algpseudocode, float}
+\makeatletter
+\def \BState{\State\hskip-\ALG@thistlm}
+\makeatother
+\usepackage{caption}
+\usepackage{lipsum}
+\usepackage{array}
+\usepackage{tabu}
+
+\begin{document}
+\title{COL776 - Assignment 1 (Part B)}
+\author{\Large Akshay Kumar Gupta\\ \texttt{2013CS50275}}
+\date{}
+\maketitle
+
+{\noindent \large Implementation Language: Python}
+\\ 
+\\
+\par \noindent
+{{\bfseries Q1a.}} Summary of the paper ``Maximum Entropy Markov Models for Information Extraction and Segmentation" by McCallum, Freitag and Pereira. \\ \\ 
+\centerline{\bfseries Motivation} \\ Hidden Markov Models (HMMs) suffer from two main problems:
+\begin{itemize}
+\item Many tasks like text segmentation and entity recognition can be improved by having a richer representation of observations than is allowed by HMMs and it would be beneficial to allow observations to be represented by arbitrary overlapping features (like word, capitalisation, POS, formatting etc. in the case of segmentation).
+\item HMMs uses a joint model and its parameters are set to maximise the likelihood of the observation sequence. However, in most text-based tasks, we need to predict the state sequence given the observation sequence.
+\end{itemize}
+~\\
+\centerline{\bfseries Model} \\ Maximum Entropy Markov Models (MEMMs), like HMMs, also have hidden states and observed variables. However, the transition and emission parameters of HMMs are replaced by a single function $P(s|s',o)$, which is the probability of the current state $s$ given the previous state $s'$ and the current observation $o$. Thus MEMM is a discrimative model as opposed to HMM which is a generative model. Further, $P(s|s',o)$ is split into $|S|$ separately trained functions $P_{s'}(s|o)$ (one for each $s'$), and each of these functions follow an exponential model. This exponential model is defined by a set of binary features over the current state s and the current observation o. \\ \\ \centerline {$P_{s'}(s,o) = \frac{1}{Z(o,s')} \exp\biggr(\sum\limits_{a}\lambda_af_a(o,s)\biggl)$} \\\\ Here, $\lambda_a$ is the parameter to be learnt for each feature $a$, and $Z(o,s')$ is the normalising factor. \vspace*{0.2cm}\\This exponential distribution satisfies the constraint that the expected value of each feature in the learned distribution is the same as its average on the training observation sequence $o_1\ldots o_m$. 
+\\ \\
+\centerline{\bfseries Advantages of MEMMs} 
+\begin{enumerate}[leftmargin=*]
+\item They model the conditional distribution of hidden states given observed variables, which can make inference and learning more tractable.
+\item They allow overlapping of features in the representation of observations, which allows for a richer set of features to be modelled in comparison to HMMs.
+\end{enumerate} 
+~\\
+\par \noindent
+{{\bfseries Q1b.}} Summary of the paper ``Conditional Random Fields: Probabilistic Models for Segmenting and Labeling Sequence Data" by Lafferty, McCallum and Pereira. \\ \\ 
+\centerline{\bfseries Motivation} \\ MEMMs and some other discriminative models suffer from a problem known as the `label bias problem'. In MEMMs, each source state has a separate normalised probability distribution of next state given observation. Because of this, all the mass arriving at a state is distributed among the possible successor states. The observations can only influence which states get how much mass, not how much mass gets passed on. This leads to a bias towards states with fewer outgoing transitions. If a state has only one successor, then the observation at that point is effectively ignored. CRFs aim to address this issue while retaining all the benefits of MEMMs over HMMs. \\ \\ 
+\centerline{\bfseries Terminology}
+\begin{itemize}[leftmargin=*]
+\item[-] $X$ is a random variable over data sequences to be labeled
+\item[-] $Y$ is a random variable over label sequences. Components $Y_i$ of $Y$ range over a finite label alphabet $\mathcal{Y}$.
+\end{itemize} 
+~\\
+\centerline{\bfseries Model} \\ Let $G = (V,E)$ be a graph such that $Y = (Y_v)_{v \in V}$, so that $Y$ is indexed by the vertices of $G$. Then $(X,Y)$ is a conditional random field in case, when conditioned on $X$, the random variables $Y_v$ obey the Markov property with respect to the graph: $P(Y_v |X,Y_w, w \ne v)=p(Y_v |X,Y_w, w \sim v)$,where $v \sim w$ means that $w$ and $v$ are neighbours in $G$. \vspace*{0.1cm}\\The paper assumes the graph $G$ over $Y$ to be a tree. In this case, the cliques in $G$ are only the edges and vertices of $G$. Hence, for the conditional random field $(Y,X)$, the distribution over the label sequences $Y$ given $X$ has the form:\\ \\
+\centerline{$P_\theta(y|x)\propto \exp\Biggl(\sum\limits_{e \in E,k}\lambda_kf_k(e,y|_e,x) + \sum\limits_{v \in V,k}\mu_kg_k(v,y|_v,x)\Biggr)$} 
+\\ \\ 
+or \hspace*{-0.4cm}\centerline{$P_\theta(y|x)=\frac{1}{Z_x} \exp\Biggl(\sum\limits_{e \in E,k}\lambda_kf_k(e,y|_e,x) + \sum\limits_{v \in V,k}\mu_kg_k(v,y|_v,x)\Biggr)$} 
+\\ \\
+where $x$ is a data sequence, $y$ is a label sequence, $y|_S$ is the set of components of $y$ associated with the vertices in the subgraph $S$, $f_k$ and $g_k$ are a given set of features defined either over variables in $Y$ or variables in both $X$ and $Y$, and $Z_x$ is the normalisation factor that depends only on the observed sequence $x$.\vspace*{0.1cm}\\The paper further assumes that the dependencies of $Y$, conditioned on $X$, form a chain. Then for each position $i$ in the observation sequence $x$, we can define the $|\mathcal{Y}|\times|\mathcal{Y}|$ matrix $M_i(x)=[M_i(y',y|x)]$ by
+\begin{align*}
+M_i(y',y|x)&=\exp(\Lambda_i(y',y|x)) \\
+\Lambda_i(y',y|x) & = \sum\limits_{k}\lambda_kf_k(e_i,Y|_{e_i}=(y',y),x) + \sum\limits_{v \in V,k}\mu_kg_k(v,Y|_{v_i}=y,x)
+\end{align*}
+Then the normalisation function is
+\begin{equation*}
+Z_\theta(x) = \Biggl(\prod_{i=1}^{n+1}M_i(x)\Biggr)_{(0, n+1)}
+\end{equation*}
+Hence the conditional probability of a label sequence $y$ given an observation sequence $x$ is
+\begin{equation*}
+P_\theta(y|x) = \frac{\Biggl(\prod_{i=1}^{n+1}M_i(y_{i-1},y_i|x)\Biggr)}{\hspace*{1cm}\Biggl(\prod_{i=1}^{n+1}M_i(x)\Biggr)_{(0, n+1)}}
+\end{equation*}
+\\ \\
+\centerline{\bfseries Advantages of CRFs}
+\begin{enumerate}[leftmargin=*]
+\item The class of CRFs is much more expressive than HMMs, because it allows arbitrary dependencies between the observed variables.
+\item They model the conditional distribution of hidden states given observed variables, which can make inference and learning more tractable.
+\item The features do not need to completely specify a state or observation, so it is expected that the model can be estimated from less training data.
+\item The loss function is convex.
+\item The probability distribution of state transition is normalised across all possible source states, so the label bias problem does not occur.
+\end{enumerate} 
+~
+\vspace*{-0.2cm}
+\\
+\centerline{\bfseries Experimental Results}
+\begin{enumerate}[leftmargin=*]
+\item It was confirmed experimentally using a synthetically generated dataset that CRFs do not face the label bias problem while MEMMs do.
+\item In a POS tagging experiment it was observed that CRF outperform MEMMs, and adding overlapping features for the observations (which cannot be done in an HMM) allowed both CRF and MEMM to outperform HMM significantly.
+\end{enumerate} 
+~\\
+\par \noindent
+{{\bfseries Q2a.}} Data Structures used:
+\begin{itemize}
+\item A dictionary (hash table) $D$ is used to map each character to a distinct number in the range 0-9 (as there are only 10 characters in the vocabulary).
+\item The transitional probabilities are represented by a two-dimensional 10x10 vector $T$ of floats where $T[i][j]$ is the probability $P(y_{t+1}=b | y_t = a)$, where $D[a] = i$ and $D[b]=j$.
+\item The emission probabilities are represented by a two-dimensional 1000x10 vector $E$ of floats where $E[i][j]$ is the probability $P(x_t=i|y_t=a)$, where $i$ is the image number and $D[a]=j$.
+\end{itemize}
+~\\
+{{\bfseries Q2b.}} Accuracy table:
+\begin{itemize}[leftmargin=*]
+\item OCR Model (OCR Factors)
+\end{itemize}
+\begin{center}
+\begin{tabu} to \textwidth { | X[c] | X[c] | X[c] | X[c] |}
+\hline
+ Dataset & Character Accuracy & Word Accuracy & Average Log-Likelihood \\
+\hline
+small/images.dat & 53.92 \% & 8.65 \% & -7.808\\
+\hline
+large/images1.dat & 58.39 \% & 11.11 \% & -7.876\\
+\hline
+large/images2.dat & 57.25 \% & 10.00 \% & -7.874\\
+\hline
+large/images3.dat & 57.24 \% & 9.91 \% & -7.865\\
+\hline
+large/images4.dat & 57.57 \% & 11.47 \% & -7.869\\
+\hline
+large/images5.dat & 58.53 \% & 11.56 \% & -7.857\\
+\hline
+\end{tabu}
+\end{center}
+\newpage
+\begin{itemize}[leftmargin=*]
+\item Transition Model (OCR and Transition Factors)
+\end{itemize}
+\begin{center}
+\begin{tabu} to \textwidth { | X[c] | X[c] | X[c] | X[c] |}
+\hline
+ Dataset & Character Accuracy & Word Accuracy & Average Log-Likelihood \\
+\hline
+small/images.dat & 66.27 \% & 25.96 \% & -7.097\\
+\hline
+large/images1.dat & 68.04 \% & 24.04 \% & -7.175\\
+\hline
+large/images2.dat & 67.68 \% & 24.17 \% & -7.174\\
+\hline
+large/images3.dat & 67.87 \% & 24.68 \% & -7.167\\
+\hline
+large/images4.dat & 68.24 \% & 24.68 \% & -7.170\\
+\hline
+large/images5.dat & 68.45 \% & 26.69 \% & -7.158\\
+\hline
+\end{tabu}
+\end{center}
+\begin{itemize}[leftmargin=*]
+\item Combined Model (OCR, Transition and Skip Factors)
+\end{itemize}
+\begin{center}
+\begin{tabu} to \textwidth { | X[c] | X[c] | X[c] | X[c] |}
+\hline
+ Dataset & Character Accuracy & Word Accuracy & Average Log-Likelihood \\
+\hline
+small/images.dat & 71.17 \% & 35.57 \% & -6.279\\
+\hline
+large/images1.dat & 70.83 \% & 31.48 \% & -6.271\\
+\hline
+large/images2.dat & 70.72 \% & 31.80 \% & -6.271\\
+\hline
+large/images3.dat & 70.62 \% & 31.94 \% & -6.265\\
+\hline
+large/images4.dat & 70.77 \% & 31.85 \% & -6.267\\
+\hline
+large/images5.dat & 71.06 \% & 33.31 \% & -6.257\\
+\hline
+\end{tabu}
+\end{center}
+~\\
+\begin{itemize}[leftmargin=*]
+\item[-] Examples of words in the small dataset that were incorrectly predicted by OCR Model and corrected by Transition Model : ado, hent, reader, renter, toston, tote
+\item[-] Examples of words in the small dataset that were incorrectly predicted by OCR Model, partially corrected by Transition Model and fully corrected by Combined Model : noon, ratoon, seeder
+\end{itemize}
+~\\
+{\bfseries Extra Credit : } I tried squaring the Transition and OCR parameters, varying the skip factor, and combinations of the above, but the accuracy decreased in all of these cases (on the small dataset). Scaling all the transition/OCR factors will result in the same distribution so there is no point in doing that.
+\\
+\\
+Discussed assignment with : Barun Patra, Haroun Habeeb, Kabir Chhabra
+\end{document}

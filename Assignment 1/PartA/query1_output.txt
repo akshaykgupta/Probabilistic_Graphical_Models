@@ -1,0 +1,4 @@
+query:[4] obs:[3,6,7] dsep:[3,6,7] req-prob:[1,2,4,5,6,7] req-obs:[3,6,7]
+query:[2] obs:[1,6,7] dsep:[1,6,7] req-prob:[2,3,5,6,7] req-obs:[6,7]
+query:[1,4] obs:[2,5] dsep:[2,3,5,6,7] req-prob:[1,4] req-obs:[2]
+query:[1] obs:[] dsep:[2,3,5,6,7] req-prob:[1] req-obs:[]

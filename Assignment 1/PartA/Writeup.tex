@@ -1,0 +1,115 @@
+\documentclass[]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{enumitem}
+\usepackage{algpseudocode, float}
+\makeatletter
+\def \BState{\State\hskip-\ALG@thistlm}
+\makeatother
+\usepackage{caption}
+\usepackage{lipsum}
+
+\makeatletter
+\newenvironment{breakablealgorithm}
+  {% \begin{breakablealgorithm}
+   \begin{center}
+     \refstepcounter{algorithm}% New algorithm
+     \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+     \renewcommand{\caption}[2][\relax]{% Make a new \caption
+       {\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+       \ifx\relax##1\relax % #1 is \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+       \else % #1 is not \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+       \fi
+       \kern2pt\hrule\kern2pt
+     }
+  }{% \end{breakablealgorithm}
+     \kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+   \end{center}
+  }
+\makeatother
+
+\begin{document}
+\title{COL776 - Assignment 1 (Part A)}
+\author{\Large Akshay Kumar Gupta\\ \texttt{2013CS50275}}
+\date{}
+\maketitle
+
+{\noindent \large Implementation Language: C++}
+\\ 
+\\
+\par \noindent
+{{\bfseries Q1.}} Input from the user are the numbers $n$ (number of nodes) and $k$. To generate a random Bayesian network, nodes $1 \ldots n$ are considered in topological order. For each node $i$, a number $u$ between $1$ and $k$ is chosen uniformly at random. Now the list $(i+1 \ldots n)$ is taken and shuffled uniformly. The first $u$ elements of the shuffled list are chosen as children of node $i$. This guarantees that the $u$ children are picked uniformly. Shuffling a list takes time proportional to the length of the list so time taken for network generation is $\mathcal{O}(n^2)$.
+\\
+\par \noindent
+{{\bfseries Q2.}} Summary of the paper ``Bayes-Ball: The Rational Pastime" by Ross D. Schachter : \\ \\ \centerline{\bfseries Problem Statement} \\ Given a Bayesian network $\mathcal{G}$, a set of observed nodes $K$ and a set of query nodes $J$, find the set of nodes which are $d$-separated from $J$ (irrelevant nodes), the set of nodes whose conditional probability distributions are required to compute Pr$\{X_J | X_K\}$ (requisite probability nodes), and the subset of observed nodes whose states are required to compute Pr$\{X_J | X_K\}$ (requisite observation nodes). 
+\\ \\ \centerline{\bfseries Algorithm} \\ The algorithm is known as the Bayes' Ball algorithm. The basic idea of the algorithm is to send a bouncing ball to visit nodes in the network, starting from the nodes in $J$. The ball can either pass through a node, bounce back from a node, or get blocked. From basic knowledge of $d$-separation, it can be observed that:
+\begin{itemize}
+\item An unobserved node will pass the ball through and also bounce the ball back from its children.
+\item An observed node will bounce the ball back from parents and block the ball from children.
+\end{itemize}
+One further insight is that an edge need only be visited in the same direction once. This is accomplished by marking a node on either top or bottom when visited. Another advantage of this is that whether a node is marked on top or bottom (or both) will give us additional information about whether a node is a requisite probability node or a requisite observation node. The full algorithm is as follows:\\
+\begin{breakablealgorithm}
+  \caption{Bayes' Ball Algorithm}\label{bayesball}
+  \begin{algorithmic}[1]
+    \Procedure{BayesBall}{$\mathcal{G}, K, J$}
+    \State $\forall \ i \in J, $ add $i$ to frontier $\mathcal{F}$ as if $i$ was visited from a child
+    \While{$\mathcal{F}$ is not empty}
+      \State Pop a node $j$ from $\mathcal{F}$
+      \State Mark $j$ as visited
+      \If {$j \notin K$ and visit to $j$ is from a child}
+	\If{top of $j$ is not marked}
+	   \State Mark $j$ on top
+	   \State Add parents of $j$ to $\mathcal{F}$
+	\EndIf
+	\If{bottom of $j$ is not marked}
+	   \State Mark $j$ on bottom
+	   \State Add children of $j$ to $\mathcal{F}$
+	\EndIf
+     \EndIf
+     \If {visit to $j$ is from a parent}
+	\If{$j \in K$ and top of $j$ is not marked}
+	   \State Mark $j$ on top
+	   \State Add parents of $j$ to $\mathcal{F}$
+	\EndIf
+	\If{$j \notin K$ and bottom of $j$ is not marked}
+	   \State Mark $j$ on bottom
+	   \State Add children of $j$ to $\mathcal{F}$
+	\EndIf
+      \EndIf
+    \EndWhile
+    \EndProcedure
+  \end{algorithmic}
+\end{breakablealgorithm}
+~
+\\ \\
+\centerline{\bfseries Results} 
+\begin{enumerate}[leftmargin=*]
+\item The set of irrelevant nodes, $N_i(J|K)$, are those nodes not marked on bottom. This includes all the observed nodes as well as the nodes that are not visited.
+\item The set of requisite probability nodes, $N_p(J|K)$, are those nodes marked on top. 
+\item The set of requisite observation nodes, $N_e(J|K)$, are those nodes in $K$ marked as visited. 
+\end{enumerate}
+~\\
+\centerline{\bfseries Running Time} Because each edge is visited at most twice, the running time of the algorithm is linear in the size of visited part of the graph. In the worst case, this is $\mathcal{O}(m+n)$.
+\\
+\par \noindent
+{{\bfseries Q3. and Q4.}} The Bayes' ball algorithm is implemented to compute the requisite probability nodes, the requisite observation nodes, and the nodes $d$-separated from the query nodes . A frontier of nodes to be visited is maintained and vectors are maintained which record which nodes are visited, marked on bottom and marked on top. At each step a node is popped from the frontier, processed and its parents/children are added to the frontier in accordance with the algorithm. Algorithm terminates when the frontier becomes empty. Running time of the algorithm is linear in the size of the visited part of the graph, which is $\mathcal{O}(m+n)$ in the worst case, where $m$ is the number of directed edges.
+\\
+\par \noindent
+{{\bfseries Q5.}} Task is to find all sets of $d$-separated nodes, given a set of observed nodes. \\\\ {\bfseries Implemented Algorithm:} \\ We maintain an $n \times n$ boolean matrix $A$ in which $a_{ij} = true$ iff the $i^{th}$ and $j^{th}$ nodes are $d$-connected. We consider the nodes $1 \ldots n$ in topological order. We run the Bayes' Ball algorithm with the first unobserved node in this order as the query node. We obtain a set of nodes $S$ that are reachable from this node. All the nodes in $S$ are $d$-connected to each other (the broad reason being this node only has outgoing edges). Hence we set $a_{i,j} = true$ $ \forall$ $i,j \in S$. We also mark all the nodes in $S$. We again run Bayes' Ball on the next node in order which is not marked, and so on. In the end the entries in $A$ which are marked $false$ are all the pairs of nodes which are $d$-separated. The running time benefit we get from this algorithm is that the number of calls to the Bayes' ball algorithm is at most equal to the number of nodes that don't have any unobserved parents. The time complexity of the algorithm is (not sure).
+\\
+\\{\bfseries Unimplemented algorithm:} \\ The above algorithm suffers from the fact that in different calls to the Bayes' Ball algorithm, the same paths can be explored multiple times. The following algorithm addresses this problem. \\
+\begin{enumerate}[leftmargin=*]
+\item When running the Bayes' Ball algorithm, mark the connections in a unidirectional manner, so nodes occurring earlier in the path are connected to each node occurring later in the path and not the other way round.
+\item In subsequent calls to Bayes' Ball, if a node is visited which was visited in an earlier call to Bayes' Ball, this node is not added to the frontier. However, connections are added between all other nodes which are encountered in this run of Bayes' Ball and all the nodes that are connected to this node. 
+\end{enumerate}
+This algorithm will only visit edges at most twice, and pairs of nodes in $A$ will only get marked as $true$ once. Hence the running time of this algorithm is $\mathcal{O}(m+n^2)$.
+\\
+\\
+\\
+\\
+\\
+Discussed assignment with : Barun Patra, Haroun Habeeb, Kabir Chhabra
+\end{document}
