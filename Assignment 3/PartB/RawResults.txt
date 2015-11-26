@@ -1,0 +1,60 @@
+POS
+macroF_Score is 0.606897, 
+macroPrecision is 0.669608
+macroRecall is 0.554926
+POS_CAPS
+macroF_Score is 0.624202, 
+macroPrecision is 0.681537
+macroRecall is 0.575765
+POS_CAPS_ING
+macroF_Score is 0.612802, 
+macroPrecision is 0.654898
+macroRecall is 0.575791
+POS_CAPS_ING_AT
+macroF_Score is 0.643332, 
+macroPrecision is 0.691308
+macroRecall is 0.601582
+POS_CAPS_ING_AT_HASH
+macroF_Score is 0.668716, 
+macroPrecision is 0.718968
+macroRecall is 0.625031
+POS_CAPS_ING_AT_HASH_LY
+macroF_Score is 0.670084, 
+macroPrecision is 0.720019
+macroRecall is 0.626626
+POS_CAPS_ING_AT_HASH_LY_NV
+macroF_Score is 0.669728, 
+macroPrecision is 0.714991
+macroRecall is 0.629855
+POS_CAPS_ING_AT_HASH_LY_NV_URL
+macroF_Score is 0.690780, 
+macroPrecision is 0.739558
+macroRecall is 0.648037
+POS_CAPS_ING_AT_HASH_LY_NV_URL_POSS
+macroF_Score is 0.703977, 
+macroPrecision is 0.737016
+macroRecall is 0.673773
+POS_CAPS_ING_AT_HASH_LY_NV_URL_POSS_PHONE
+macroF_Score is 0.715209, 
+macroPrecision is 0.763036
+macroRecall is 0.673025
+NER
+macroF_Score is 0.173822, 
+macroPrecision is 0.556373
+macroRecall is 0.103001
+NER_CAPS
+macroF_Score is 0.241976, 
+macroPrecision is 0.510105
+macroRecall is 0.158606
+NER_CAPS_2
+macroF_Score is 0.173394, 
+macroPrecision is 0.342428
+macroRecall is 0.116089
+NER_CAPS_POS
+macroF_Score is 0.232137, 
+macroPrecision is 0.346890
+macroRecall is 0.174433
+NEW_CAPS_PLACE
+macroF_Score is 0.215666, 
+macroPrecision is 0.303393
+macroRecall is 0.167293

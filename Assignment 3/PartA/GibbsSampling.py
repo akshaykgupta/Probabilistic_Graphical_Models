@@ -417,14 +417,14 @@ class CRF:
 		c.writerow(row)
 
 crf = CRF()
-for iterations in range(10000, 15000, 500):
-	# crf.accuracy(dataset = 'tree', metric = 'all', model = 'pair_skip', technique = 'ordered')
-	# crf.accuracy(dataset = 'treeWS', metric = 'all', model = 'pair_skip', technique = 'ordered')
-	# crf.accuracy(dataset = 'loops', metric = 'all', model = 'pair_skip', technique = 'ordered')
-	crf.accuracy(dataset = 'loopsWS', metric = 'all', model = 'pair_skip', technique = 'ordered', n_iterations = iterations)
+# for iterations in range(10000, 15000, 500):
+# 	# crf.accuracy(dataset = 'tree', metric = 'all', model = 'pair_skip', technique = 'ordered')
+# 	# crf.accuracy(dataset = 'treeWS', metric = 'all', model = 'pair_skip', technique = 'ordered')
+# 	# crf.accuracy(dataset = 'loops', metric = 'all', model = 'pair_skip', technique = 'ordered')
+# 	crf.accuracy(dataset = 'loopsWS', metric = 'all', model = 'pair_skip', technique = 'ordered', n_iterations = iterations)
 
 # crf.accuracy(dataset = 'tree', metric = 'all', model = 'pair_skip', technique = 'ordered')
 # crf.accuracy(dataset = 'treeWS', metric = 'all', model = 'pair_skip', technique = 'ordered')
 # crf.accuracy(dataset = 'loops', metric = 'all', model = 'pair_skip', technique = 'ordered')
-# crf.accuracy(dataset = 'loopsWS', metric = 'all', model = 'pair_skip', technique = 'ordered')
+crf.accuracy(dataset = 'loopsWS', metric = 'all', model = 'pair_skip', technique = 'uniform')
 

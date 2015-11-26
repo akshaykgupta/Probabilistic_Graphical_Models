@@ -1,1 +1,7 @@
 Assignments for COL776 - Probabilistic Grpahical Models
+1A. Implementing the Bayes' Ball algorithm for finding independences in Bayesian networks (Implemented in C++)
+1B. Implementing a simple CRF model for Optical Character Recognition (Python)
+2A. Inference using clique tree message passing and cluster graph belief propagation in Markov Networks (Python)
+2B. Inference using the Viterbi algorithm for Hidden Markov Models (Python)
+3A. Inference using Gibbs sampling (MCMC) in Markov Networks (Python)
+3B. POS tagging and Named Entity Recognition in Tweets (using MALLET)
